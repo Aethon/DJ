@@ -1,2026 +1,303 @@
-<!-- ===============================================================
-            DTD for Dow Jones
-            Ver. 1.13
-            March 23th, 2009
-     ===============================================================
-            EidosMedia S.p.A.
-            Viale Legioni Romane, 43
-            20147 Milano
-     ===============================================================
-            Copyright (c) 2008
-            All Rights Reserved.
-     ===============================================================
+<!-- 
+File Name:               djml-plus-article.dtd
+Last Revised:            2009/03/16
+Doctype Name:            article-doc
+Public ID:               -//Dow Jones//DTD XML DJML//EN
+Revision history:
+	Derived from djml-h.dtd
+	Element and entity declarations changed to conform to XML syntax:
+		Moved comments outside element declarations
+		Removed tag minimization specifications
+		Removed inclusions and exclusions
+
+	This dtd is deployed with wsjcaps rpm build to edwebs.
+	Destination /export/home/appadmin/ directory
+
 -->
-<!--
-HISTORY
-Version 1.0 (06/12/2008)
-First draft.
 
-Version 1.01 (07/02/2008)
-Added <lede6>.
 
-Version 1.02 (07/11/2008)
-Added <related-links>, <pagebreak>, <in-set>, <small-head>, <high-head>.
-Added <data-source>. Reminder: check attributes.
-Removed <related-site>, <link-dld>, <internal-link>, <external-link>, <link-app1>...<link-app4>, <link-to-spec>
-Changed definition of <audio>, <video>, <chart>, <display-ad> (now children can appear in any order).
+<!-- ======================================================== -->
+<!--           INCLUDED ENTITY DEFINITIONS                    -->
+<!-- ======================================================== -->
+<!-- XML: Changed to include system identifiers -->
+<!ENTITY % ISOnum PUBLIC "ISO 8879:1986//ENTITIES Numeric and Special Graphic//EN" "ISOnum.pen">
+<!ENTITY % ISOpub PUBLIC "ISO 8879:1986//ENTITIES Publishing//EN" "ISOpub.pen">
+<!ENTITY % ISOlat1 PUBLIC "ISO 8879:1986//ENTITIES Added Latin 1//EN" "ISOlat1.pen">
 
-Version 1.03 (09/05/2008)
-Changed <in-set> (now it can contain <p>).
-Added <infographic>, <infographic-caption>, <infographic-prod>, <infographic-data>.
-Deleted <header-web>.
-Changed <headline-web> (now it can have different children).
-Added <grouphead-web>, <overhead-web>, <deck-web>.
-Changed <w-photo> (added attribute alt-text).
-Added attribute "data" to <sysvar>
+%ISOnum; 
+%ISOpub;
+%ISOlat1;
 
-Version 1.04 (09/22/2008)
-Added href optional attribute to all content item tags. Xsmile populates this attribute when a content item is made external.
+<!ENTITY % DJML-Plus-Common-Entities PUBLIC "-//Dow Jones//ENTITIES XMl Common Entity Models Version 1.0//EN"
+   "djml-plus-common-ents.dcl" >
 
-Version 1.05 (10/17/2008)
-Added <credits> tag. Removed content-item specific attributes from <web-content>.
+%DJML-Plus-Common-Entities;
 
-Version 1.06 (10/22/2008)
-Added <out-set> element. It is child of <text> and can appear only before </text>.
-Added attributes name, code, ticker, symbol to <company>.
+<!-- ======================================================== -->
+<!--               PROCESSING INSTRUCTIONS                    -->
+<!-- ======================================================== -->
 
-Version 1.07 (10/23/2008)
-<summary-web> and <ticker> are now content items. Added content-item specific attributes to them.
-Changed contentType attribute value of <infographic> and <chart> from "graphics" to "graphic".
-Added href attribute to <infographic>, <table>, <pbox>.
+<!-- ======================================================== -->
+<!--                       NOTATIONS                          -->
+<!-- ======================================================== -->
 
-Version 1.08 (11/14/2008)
-Renamed <ticker> into <zipper-headline>.
-Added <seo-headline> and <seo-summary> as children of <web-content>.
-Added <small-head> and <high-head> as children of <in-set>.
-Elements of entity %Linetext and %linetext cannot have anymore as children elements of entity %Link.
-Removed entity %MediaLink.
+<!NOTATION SGML PUBLIC
+  "+//ISO 8879:1986//NOTATION Standard Generalized Markup Language//EN">
 
-Version 1.09 (11/18/2008)
-Added <seo-content> as child of <web-content>.
-Moved <seo-headline> and <seo-summary> as children of <seo-content>.
 
-Version 1.10 (11/27/2008)
-Removed %Link entity from all entities. Now it appears only as child of <web-content> and <in-set>.
+<!NOTATION GIF PUBLIC   
+   "+//ISBN 0-7923-9432-1::Graphic Notation//NOTATION
+     CompuServe Graphic Interchange Format//EN">
 
-Version 1.11 (12/15/2008)
-Added <photo-summary-web>.
-Removed commented element <ln>.
+<!NOTATION BMP PUBLIC
+  "+//ISBN 0-7923-9432-1::Graphic Notation//NOTATION Microsoft Windows Bitmap//EN">
 
-Version 1.12 (03/16/2009)
-<web-content>: added attribute "channel".
-<photo-web>: changed element definition; added attribute "channel".
-<photo-print>: changed element definition.
-<photo-group>: changed element definition.
-<photo-summary-web>: changed element definition.
-<SummarySizesItems>: added.
-<item>: added.
-<seo-content>: added attribute "channel".
-<video-content> changed element definition; added attribute "channel".
-<photo-web>: now it's a sibling of <p>; added attribute "popupSize".
-<company>: added attribute "significance".
-<person>: added attributes "significance", "nameordering".
-<person_a>: added attributes "significance", "nameordering".
-<audio-package>: added as a sibling of <p>.
-<video-package>: now it's a sibling of <p>.
+<!NOTATION WMF PUBLIC
+   "+//ISBN 0-7923-9432-1::Graphic Notation//NOTATION 
+     Microsoft Windows Metafile//EN">
 
-Version 1.13 (03/23/2009)
-<credits-text>: added.
-<photo-web>: added child <credits-text>.
-<chart-group>: added.
-<video-package>: added child <caption-text>.
-<audio-package>: added child <caption-text>.
-<infographic-package>: added.
-<chart>: changed: now emtpy children list.
-<chart-gorup>: added.
-%Media: removed <chart>.
+<!NOTATION JPEG PUBLIC
+   "-//Dow Jones//NOTATION JPEG//EN">
 
-Updated 10/29/2009 by john O'connor for Martin Anthonisamy
-- Search for the term "<!ELEMENT text "
-- Replace the entire line with
-<!ELEMENT text (content | (%Blocktext;)+ | superbyline | tagline | out-set)*>
+<!-- XML: No support for #NOTATION attribute declarations. -->
+<!-- ATTLIST #NOTATION (GIF|JPEG|BMP|WMF)
+	  height   NUMBER     #IMPLIED 
+	  width    NUMBER     #IMPLIED -->
 
-Version 1.14 (Jan 06 -2010) Martin
-Media tags are removed from BlockText
-Media tags are added in <summary-web>
-Added LinetextNoCity, it's a clone of LineText but no <city> tags
+<!NOTATION MAP PUBLIC
+   "-//Dow Jones//NOTATION MAP//EN">
 
-Version 1.15 (Jan 13 -2010) Martin
-Media tags are inserted for in-set
--->
-<!-- =============================================================== -->
-<!--
-            The DTD includes an adapted version of 
-            W3C xhtml1-transitional.dtd
-            excluding elements:
-   
-            html, head, body,
-            meta, link,
-            title, base,
-            bdo, iframe,
-            ins, del, menu, dir,
-            noframes, pre, dfn, code, samp, kbd, var
-            
-            Included elements from html 4.01 loose.dtd:
-            
-            isindex,
-            script, map, area, object, param, applet,
-            form, label, input, select, textarea, fieldset,
-            legend, button, noscript           
-            
-            (the element embed is also included in the object element)   
--->
-<!-- =====================================================================-->
-<!--                                                                      -->
-<!-- Accent -->
-<!ENTITY nbsp "&#160;">
-<!ENTITY ldquo "&#8220;">
-<!ENTITY rdquo "&#8221;">
-<!ENTITY lsquo "&#8216;">
-<!ENTITY rsquo "&#8217;">
-<!ENTITY hellip "&#8230;">
-<!ENTITY copy "&#169;">
-<!ENTITY reg "&#174;">
-<!ENTITY trade "&#8482;">
-<!--================== Imported Names ====================================-->
-<!--                                                                      -->
-<!ENTITY % ContentType "CDATA">
-<!ENTITY % ContentTypes "CDATA">
-<!ENTITY % Charset "CDATA">
-<!ENTITY % Charsets "CDATA">
-<!ENTITY % LanguageCode "NMTOKEN">
-<!ENTITY % Character "CDATA">
-<!ENTITY % Number "CDATA">
-<!ENTITY % LinkTypes "CDATA">
-<!ENTITY % MediaDesc "CDATA">
-<!ENTITY % URI "CDATA">
-<!ENTITY % UriList "CDATA">
-<!ENTITY % Datetime "CDATA">
-<!ENTITY % Script "CDATA">
-<!ENTITY % StyleSheet "CDATA">
-<!ENTITY % Text "CDATA">
-<!ENTITY % FrameTarget "NMTOKEN">
-<!ENTITY % Length "CDATA">
-<!ENTITY % MultiLength "CDATA">
-<!ENTITY % MultiLengths "CDATA">
-<!ENTITY % Pixels "CDATA">
-<!-- these are used for image maps -->
-<!ENTITY % Shape "(rect|circle|poly|default)">
-<!ENTITY % Coords "CDATA">
-<!-- used for object, applet, img, input and iframe -->
-<!ENTITY % ImgAlign "(top|middle|bottom|left|right|center)">
-<!-- a color using sRGB: #RRGGBB as Hex values -->
-<!ENTITY % Color "CDATA">
+<!NOTATION CGI PUBLIC
+   "-//Dow Jones//NOTATION CGI//EN">
 
-<!ENTITY TEMPLATE_WEB_PORTION SYSTEM "/SysConfig/WSJ30/Rules/template_web_portion.xml">
-<!--=================== Generic Attributes ===============================-->
-<!--                                                                      -->
-<!-- core attributes common to most elements
-  id       document-wide unique id
-  class    space separated list of classes
-  style    associated style info
-  title    advisory title/amplification
--->
-<!ENTITY % coreattrs "id          ID             #IMPLIED
-  class       CDATA          #IMPLIED
-  style       %StyleSheet;   #IMPLIED
-  title       %Text;         #IMPLIED
-  csl       %Text;         #IMPLIED">
-<!--                                                                      -->
-<!-- internationalization attributes
-  lang        language code (backwards compatible)
-  xml:lang    language code (as per XML 1.0 spec)
-  dir         direction for weak/neutral text
--->
-<!ENTITY % i18n "lang        %LanguageCode; #IMPLIED
-  xml:lang    %LanguageCode; #IMPLIED
-  dir         (ltr|rtl)      #IMPLIED">
-<!--                                                                      -->
-<!ENTITY % events "onclick     %Script;       #IMPLIED
-  ondblclick  %Script;       #IMPLIED
-  onmousedown %Script;       #IMPLIED
-  onmouseup   %Script;       #IMPLIED
-  onmouseover %Script;       #IMPLIED
-  onmousemove %Script;       #IMPLIED
-  onmouseout  %Script;       #IMPLIED
-  onkeypress  %Script;       #IMPLIED
-  onkeydown   %Script;       #IMPLIED
-  onkeyup     %Script;       #IMPLIED">
-<!--                                                                      -->
-<!ENTITY % focus "accesskey   %Character;    #IMPLIED
-  tabindex    %Number;       #IMPLIED
-  onfocus     %Script;       #IMPLIED
-  onblur      %Script;       #IMPLIED">
-<!ENTITY % attrs "%coreattrs; %i18n; %events;">
-<!--                                                                      -->
-<!-- text alignment for p, div, h1-h6. The default is
-     align="left" for ltr headings, "right" for rtl -->
-<!--                                                                      -->
-<!ENTITY % TextAlign "align (left|center|right) #IMPLIED">
-<!--                                                                      -->
-<!--=================== Text Elements ====================================-->
-<!--                                                                      -->
-<!ENTITY % special "lede1 | lede2 | lede3 | lede4 | lede5 | lede6 | pagebreak | span | br | ld | sysvar | email | img | object | script | map | applet | annotation">
-<!--                                                                      -->
-<!ENTITY % formctrl "input | select | textarea | label | button">
-<!--                                                                      -->
-<!ENTITY % fontstyle "tt | i | b | f1 | f2 | f3 | f4 | f5 | f6 | f7 | f8 | f9 | big | small | u | s | strike | font | n | c | xc | l | xl | sc | bi ">
-<!--                                                                      -->
-<!ENTITY % phrase "em | strong | q | sub | sup | cite | abbr | acronym">
-<!--                                                                      -->
-<!ENTITY % inline "%special; | a | %fontstyle; | %phrase; | %formctrl;">
-<!--                                                                      -->
-<!--      %Inline; covers inline or "text-level" elements                 -->
-<!--                                                                      -->
-<!ENTITY % Inline "(#PCDATA | %inline;)*">
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                       ELEMENT ENTITIES                            -->
-<!--                                                                   -->
-<!--   =============================================================   -->
-<!ENTITY % Media "logo | audio | p-photo | w-photo | photo-print | photo-web | video-package | audio-package | infographic-package | infographic | video | display-ad">
-<!--                                                                   -->
-<!ENTITY % Link "related-links | related-link">
-<!--                                                                   -->
-<!ENTITY % Htmlspans "s1 | s2 | s3 | s4 | s5 | s6 | s7 | s8 | s9 | s10">
-<!--                                                                   -->
-<!ENTITY % Linetext "#PCDATA | author | credits | company | notes | copyright | description | event | source | function | location | dateline | city | name | person | person_a | data-source | SummarySizesItems | %inline; | %Htmlspans;">
+<!NOTATION AU PUBLIC
+   "-//Dow Jones//NOTATION AU//EN">
 
-<!ENTITY % LinetextNoCity "#PCDATA | author | credits | company | notes | copyright | description | event | source | function | location | dateline | name | person | person_a | data-source | SummarySizesItems | %inline; | %Htmlspans;">
-<!--                                                                   -->
-<!--     Entity "linetext" as "Linetext" without #PCDATA               -->
-<!--                                                                   -->
-<!ENTITY % linetext "author | credits | company | notes | copyright | description | event | source | function | location | dateline | city | name | person | person_a | data-source | SummarySizesItems | %inline; | %Htmlspans;">
-<!--                                                                   -->
-<!--================== Block level elements ==============================-->
-<!--                                                                      -->
-<!ENTITY % heading "h1 | h2 | h3 | h4 | h5 | h6">
-<!ENTITY % lists "ul | ol | dl">
-<!ENTITY % blocktext "hr | blockquote | address | center">
-<!ENTITY % block "p | table | %lists; | div | %blocktext; | %heading; | noscript | isindex | form | fieldset | xref">
-<!ENTITY % Block "(%block;)*">
-<!--                                                                   -->
-<!-- %Flow; mixes Block and Inline and is used for list items etc. -->
-<!ENTITY % Flow "(#PCDATA | %block; | %inline;)*">
-<!--                                                                   -->
-<!ENTITY % Blocktext "byline-text | date | time | subhead | in-set | small-head | high-head | question | answer | %block; | webposted">
-<!--                                                                   -->
-<!ENTITY % emflow "(#PCDATA | %linetext; | %Media; | %block; | byline-text | date | time | tagline)*">
-<!--                                                                   -->
-<!--===================================================================-->
-<!ENTITY % a.content "#PCDATA | company | notes | copyright | date | description | event | source | function | location | dateline | city | name | time | person | person_a | data-source | webposted | %Media; | %special; | %fontstyle; | %phrase;">
-<!--                                                                     -->
-<!--                                                                      -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                      ELEMENT DEFINITIONS                          -->
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                       ELEMENT WEB-CONTENT                                -->
-<!--                                                                   -->
-<!ELEMENT web-content (photo-summary-web | summary-web | byline-text | seo-content | %Media; | %Link; )*>
-<!--                                                                   -->
-<!ELEMENT grouphead-web (overhead-web?, headline-web, deck-web? )>
-<!--                                                                   -->
-<!ELEMENT overhead-web (%Blocktext;)+>
-<!--                                                                   -->
-<!ELEMENT headline-web (%Blocktext;)+>
-<!--                                                                   -->
-<!ELEMENT deck-web (%Blocktext;)+>
-<!--                                                                   -->
-<!--                   ELEMENT  SEO-CONTENT                -->
-<!--    Used for search engine optimization     -->
-<!ELEMENT seo-content (seo-headline, seo-summary)>
-<!--                                                                   -->
-<!--                   ELEMENT  SEO-HEADLINE               -->
-<!--                                                                   -->
-<!ELEMENT seo-headline (%Blocktext;)+>
-<!--                                                                   -->
-<!--                   ELEMENT  SEO-SUMMARY                -->
-<!--                                                                   -->
-<!ELEMENT seo-summary (%Blocktext;)+>
-<!--                                                                   -->
-<!--                   ELEMENT  PHOTO-SUMMARY-WEB          -->
-<!--                                                                   -->
-<!ELEMENT photo-summary-web (w-photo?, photo-caption?, photo-prod?, photo-data?)+>
-<!--                                                                   -->
-<!--                   ELEMENT  SUMMARY-WEB                -->
-<!--                                                                   -->
-<!ELEMENT summary-web (grouphead-web | (%Media;)* |%Blocktext;)+>
-<!--                                                                   -->
-<!--                   ELEMENT  STORY                                  -->
-<!--                                                                   -->
-<!ELEMENT story (header | grouphead | summary-print | byline-box | text | tables | extra | jump | end-story | photo-group | chart-group | pbox | %Media;)*>
-<!--                                                                   -->
-<!--                      ELEMENT HEADER                               -->
-<!--                                                                   -->
-<!ELEMENT header (p, (%Media;)?)+>
-<!--                                                                   -->
-<!--                      ELEMENT GROUPHEAD                            -->
-<!--                                                                   -->
-<!ELEMENT grouphead (overhead?, headline, deck?, barhead?, (%Media;)*)>
-<!--                                                                   -->
-<!ELEMENT overhead (p, (%Media;)?)+>
-<!ELEMENT headline (p, section?, (%Media;)?)+>
-<!ELEMENT deck (p, (%Media;)?)+>
-<!ELEMENT barhead (p, (%Media;)?)+>
-<!--                                                                   -->
-<!--                      ELEMENT SUMMARY-PRINT                              -->
-<!--                                                                   -->
-<!ELEMENT summary-print (%Blocktext;)+>
-<!--                                                                   -->
-<!--                      ELEMENT TEXT                                 -->
-<!--                                                                   -->
-<!ELEMENT text (content | (%Blocktext;)+ | superbyline | tagline | out-set  | %Media;)*>
-<!--                                                                   -->
-<!--                      ELEMENT BYLINE                               -->
-<!--                                                                   -->
-<!ELEMENT byline-box (content | (%Blocktext;)+ | superbyline | tagline)*>
-<!--                                                                   -->
-<!--                      ELEMENT TABLES                               -->
-<!--                                                                   -->
-<!ELEMENT tables (content | (%Blocktext;)+ | superbyline | tagline)*>
-<!--                                                                   -->
-<!--                      ELEMENT EXTRA                               -->
-<!--                                                                   -->
-<!ELEMENT extra (content | (%Blocktext;)+ | superbyline | tagline)*>
-<!--                                                                   -->
-<!--                      ELEMENT  CONTENT                             -->
-<!--                                                                   -->
-<!ELEMENT content %emflow;>
-<!--                                                                   -->
-<!--                      ELEMENT  VIDEO-PACKAGE                       -->
-<!--                                                                   -->
-<!ELEMENT video-package (photo-web?, caption-text?, content-multimedia?)+>
-<!--                                                                   -->
-<!--                      ELEMENT  AUDIO-PACKAGE                       -->
-<!--                                                                   -->
-<!ELEMENT audio-package (photo-web?, caption-text?, content-multimedia?)+>
-<!--                                                                   -->
-<!--                      ELEMENT  INFOGRAPHIC-PACKAGE                 -->
-<!--                                                                   -->
-<!ELEMENT infographic-package (photo-web?, caption-text?, content-multimedia?)+>
-<!--                                                                   -->
-<!--                      ELEMENT  SUPERBYLINE                         -->
-<!--                                                                   -->
-<!ELEMENT superbyline %emflow;>
-<!--                                                                   -->
-<!--                      ELEMENT  END-STORY                           -->
-<!--                                                                   -->
-<!ELEMENT end-story (%Blocktext;)*>
-<!--                                                                   -->
-<!--                      ELEMENT  ITEM                                -->
-<!--                                                                   -->
-<!ELEMENT item (#PCDATA)>
-<!--                                                                   -->
-<!--                      PHOTO  WEB (INLINE)                          -->
-<!--                                                                   -->
-<!ELEMENT photo-web (w-photo?, photo-caption?, caption-text?, credits-text?, photo-prod?, photo-data?)+>
-<!--                                                                   -->
-<!--                      ELEMENT  CONTENT-MULTIMEDIA                  -->
-<!--                                                                   -->
-<!ELEMENT content-multimedia (caption-text?, video-prod?, video-data?, photo-prod?, photo-data?)>
-<!--                                                                   -->
-<!--                      ELEMENT  CAPTION-TEXT                        -->
-<!--                                                                   -->
-<!ELEMENT caption-text (p)*>
-<!--                                                                   -->
-<!--                      ELEMENT  CREDITS-TEXT                        -->
-<!--                                                                   -->
-<!ELEMENT credits-text (p)*>
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                ELEMENTS DEFINED IN ENTITIES                       -->
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                      ENTITY BLOCKTEXT                             -->
-<!--                                                                   -->
-<!ELEMENT date (%Linetext;)*>
-<!ELEMENT time (%Linetext;)*>
-<!ELEMENT webposted (%Linetext; | %Media;)*>
-<!ELEMENT pbox ((%Blocktext;)*)>
-<!ELEMENT jump ((%Blocktext;)*)>
-<!ELEMENT in-set (%Blocktext; | subhead | small-head | high-head | video-package | audio-package | infographic-package | photo-web | content | %Link; | %Media;)*>
-<!--                                                                   -->
-<!--                      ELEMENT BYLINE-TEXT                          -->
-<!--                                                                   -->
-<!ELEMENT byline-text (byline)+>
-<!ELEMENT tagline (%Linetext; | %Media; | author1 | author2 | author3)*>
-<!ELEMENT section (%Linetext; | %Media;)*>
-<!ELEMENT author1 (name, description?)>
-<!ELEMENT author2 (name, description?)>
-<!ELEMENT author3 (name, description?)>
-<!--                                                                   -->
-<!--                      ENTITY LINETEXT                              -->
-<!--                                                                   -->
-<!ELEMENT author (%Linetext;)*>
-<!ELEMENT credits (%Linetext;)*>
-<!ELEMENT location (%Linetext;)*>
-<!ELEMENT dateline (%Linetext;)*>
-<!ELEMENT city (%LinetextNoCity;)*>
-<!ELEMENT source (%Linetext; | %Media;)*>
-<!ELEMENT company (%Linetext;)*>
-<!ELEMENT notes (%Linetext;)*>
-<!ELEMENT event (%Linetext; | %Media;)*>
-<!ELEMENT person (%Linetext;)*>
-<!ELEMENT person_a (%Linetext;)*>
-<!ELEMENT data-source (%Linetext; | %Media;)*>
-<!ELEMENT name (%Linetext;)*>
-<!ELEMENT function (%Linetext; | %Media;)*>
-<!ELEMENT description (%Linetext; | %Media;)*>
-<!ELEMENT copyright (%Linetext;)*>
-<!ELEMENT SummarySizesItems (item)+>
-<!--                                                                   -->
-<!--                                                                   -->
-<!--                       ENTITY MEDIA                   -->
-<!--                                                                   -->
-<!--                                                                   -->
-<!--                                                                   -->
-<!--          PHOTO  PRINT (INLINE)                 -->
-<!--                                                                   -->
-<!ELEMENT photo-print (p-photo?, photo-caption?, photo-prod?, photo-data?)+>
-<!--                                                                   -->
-<!--              LINK TO PHOTO FILE                -->
-<!--                                                                   -->
-<!ELEMENT p-photo EMPTY>
-<!--                                                                   -->
-<!--              LINK TO PHOTO FILE                -->
-<!--                                                                   -->
-<!ELEMENT w-photo EMPTY>
-<!--                                                                      -->
-<!--      PHOTO GROUP (CONTENT ITEM)      -->
-<!--                                                                      -->
-<!ELEMENT photo-group (pg-photo?, photo-caption?, photo-prod?, photo-data?)+>
-<!--                                                                   -->
-<!--              LINK TO PHOTO FILE                -->
-<!--                                                                   -->
-<!ELEMENT pg-photo EMPTY>
-<!--                                                                        -->
-<!--        PHOTO CAPTION (CONTENT ITEM)   -->
-<!--                                                                        -->
-<!ELEMENT photo-caption (p)*>
-<!--                                                                   -->
-<!--        OTHER PHOTO ELEMENTS           -->
-<!--                                                                   -->
-<!ELEMENT photo-prod (p)*>
-<!ELEMENT photo-data (p)*>
-<!--                                                                      -->
-<!--      CHART GROUP (CONTENT ITEM)      -->
-<!--                                                                      -->
-<!ELEMENT chart-group (chart?, cg-chart?, chart-caption?, chart-prod?, chart-data?)+>
-<!--                                                                   -->
-<!ELEMENT chart EMPTY>
-<!-- Added cg-chart as a possible alternative to chart.                -->
-<!ELEMENT cg-chart EMPTY>
-<!ELEMENT chart-caption (p)*>
-<!ELEMENT chart-prod (p)*>
-<!ELEMENT chart-data (p)*>
-<!--                                                                   -->
-<!--                                                                   -->
-<!ELEMENT video (video-prod?, video-caption?, video-data?)+>
-<!ELEMENT video-caption (p)*>
-<!ELEMENT video-prod (p)*>
-<!ELEMENT video-data (p)*>
-<!--                                                                   -->
-<!ELEMENT audio (audio-prod?, audio-caption?, audio-data?)+>
-<!ELEMENT audio-caption (p)*>
-<!ELEMENT audio-prod (p)*>
-<!ELEMENT audio-data (p)*>
-<!--                                                                   -->
-<!ELEMENT infographic (infographic-caption?, infographic-prod?, infographic-data?)+>
-<!ELEMENT infographic-caption (p)*>
-<!ELEMENT infographic-prod (p)*>
-<!ELEMENT infographic-data (p)*>
-<!--                                                                   -->
-<!ELEMENT display-ad (display-ad-prod?, display-ad-data?)+>
-<!ELEMENT display-ad-prod (p)*>
-<!ELEMENT display-ad-data (p)*>
-<!--                                                                   -->
-<!ELEMENT logo EMPTY>
-<!--                                                                   -->
-<!ELEMENT zipper-headline (p)+>
-<!--                                                                   -->
-<!--                        ENTITY LINK                      -->
-<!--                                                                   -->
-<!-- RELATED LINK CONTAINER                  -->
-<!ELEMENT related-links (related-link)+>
-<!--                                                                   -->
-<!-- RELATED LINK                                        -->
-<!ELEMENT related-link %emflow;>
-<!--                                                                   -->
-<!--  GENERIC HTML LINK                             -->
-<!ELEMENT a (%a.content;)*>
-<!--                                                                   -->
-<!--                ELEMENT OUT-SET                -->
-<!--                                                                   -->
-<!ELEMENT out-set (%Blocktext; | subhead)*>
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                        ATTRIBUTE ENTITIES                         -->
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!ENTITY % common.atts
-           "id            ID                 #IMPLIED
-            xml:lang      %LanguageCode;     #IMPLIED
-            csl       %Text;         #IMPLIED 
-            class       %Text;         #IMPLIED">
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!--                           ATTRIBUTES                              -->
-<!--                                                                   -->
-<!-- ===============================================================   -->
-<!--                                                                   -->
-<!ATTLIST story
-	%common.atts; 
->
-<!ATTLIST section
-	%common.atts; 
->
-<!ATTLIST author
-	%common.atts; 
->
-<!ATTLIST author1
-	%common.atts; 
-	underline (yes | no) #IMPLIED
->
-<!ATTLIST author2
-	%common.atts; 
-	underline (yes | no) #IMPLIED
->
-<!ATTLIST author3
-	%common.atts; 
-	underline (yes | no) #IMPLIED
->
-<!ATTLIST credits
-	%common.atts; 
->
-<!ATTLIST company
-	%common.atts; 
-	name CDATA ""
-	code CDATA ""
-	ticker CDATA ""
-	symbol CDATA ""
-	significance CDATA ""
-	displayname CDATA ""
-	sortorder CDATA ""
-	countrycode CDATA ""
-	stockexchange CDATA ""
->
-<!ATTLIST notes
-	%common.atts; 
->
-<!ATTLIST barhead
-	%common.atts; 
-	shapeItem CDATA #IMPLIED
->
-<!ATTLIST city
-	%common.atts; 
->
-<!ATTLIST content
-	%coreattrs; 
-	href %URI; #IMPLIED
->
-<!ATTLIST copyright
-	%common.atts; 
->
-<!ATTLIST date
-	%common.atts; 
->
-<!ATTLIST description
-	%common.atts; 
->
-<!ATTLIST event
-	%common.atts; 
->
-<!ATTLIST SummarySizesItems
-	%common.atts; 
->
-<!ATTLIST item
-	%common.atts; 
->
-<!ATTLIST video-package
-	%common.atts; 
-	channel CDATA #IMPLIED
->
-<!ATTLIST audio-package
-	%common.atts; 
-	channel CDATA #IMPLIED
->
-<!ATTLIST infographic-package
-	%common.atts; 
-	channel CDATA #IMPLIED
->
-<!ATTLIST content-multimedia
-	%common.atts; 
-	type CDATA #IMPLIED
-	fileref %URI; #IMPLIED
->
-<!ATTLIST caption-text
-	%common.atts; 
->
-<!ATTLIST end-story
-	%common.atts; 
->
-<!ATTLIST byline-text
-	%common.atts; 
->
-<!ATTLIST tagline
-	%common.atts; 
->
-<!ATTLIST superbyline
-	%common.atts; 
->
-<!ATTLIST source
-	%common.atts; 
->
-<!ATTLIST function
-	%common.atts; 
->
-<!ATTLIST web-content
-	%common.atts; 
-	channel CDATA #IMPLIED
->
-<!ATTLIST photo-summary-web
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST summary-web
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST grouphead-web
-	%common.atts; 
->
-<!ATTLIST overhead-web
-	%common.atts; 
->
-<!ATTLIST headline-web
-	%common.atts; 
->
-<!ATTLIST deck-web
-	%common.atts; 
->
-<!ATTLIST seo-content
-	%common.atts; 
-	channel CDATA #IMPLIED
->
-<!ATTLIST seo-headline
-	%common.atts; 
->
-<!ATTLIST seo-summary
-	%common.atts; 
->
-<!ATTLIST location
-	%common.atts; 
->
-<!ATTLIST dateline
-	%common.atts; 
->
-<!ATTLIST city
-	%common.atts; 
->
-<!ATTLIST name
-	%common.atts; 
->
-<!ATTLIST overhead
-	%common.atts; 
-	shapeItem CDATA #IMPLIED
->
-<!ATTLIST headline
-	%common.atts; 
-	shapeItem CDATA #IMPLIED
->
-<!ATTLIST deck
-	%common.atts; 
-	shapeItem CDATA #IMPLIED
->
-<!ATTLIST time
-	%common.atts; 
->
-<!ATTLIST pbox
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST jump
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST person
-	%common.atts; 
-	significance CDATA ""
-	nameordering CDATA ""
-	displayname CDATA ""
-	sortorder CDATA ""
+<!NOTATION AIFF PUBLIC
+   "-//Dow Jones//NOTATION AIFF//EN">
 
->
-<!ATTLIST person_a
-	%common.atts; 
-	significance CDATA ""
-	nameordering CDATA ""
->
-<!ATTLIST data-source
-	%common.atts;
+<!NOTATION RA PUBLIC
+   "-//Dow Jones//NOTATION RA//EN">
+
+<!NOTATION OTHER PUBLIC
+   "-//Dow Jones//NOTATION OTHER//EN">
+
+<!-- ======================================================== -->
+<!--                       ENTITIES                           -->
+<!-- ======================================================== -->
+
+		
+<!-- Declarations of a-type parameter entities. -->
+<!-- XML: Replaced parameter entity default values with 
+          explicit defaults. -->
+<!ENTITY % a.article-doc "
+	id 		 CDATA			#REQUIRED
+	ads              (%t.ads;)              'ADS-ALLOWED'
+	type             CDATA                  #IMPLIED
+	display-name     CDATA                  #IMPLIED
+	level            CDATA                  #IMPLIED
+	product          CDATA                  #IMPLIED
+	section          CDATA                  #IMPLIED
+	page             CDATA                  #IMPLIED
+	style            CDATA                  #IMPLIED
+	language         CDATA                  #IMPLIED
+	publication      CDATA                  #IMPLIED
+	bureau           CDATA                  #IMPLIED
+	date             CDATA                  #IMPLIED
+	orig-pub-date    CDATA                  #IMPLIED
+	time             CDATA                  #IMPLIED
+	embargo          CDATA                  #IMPLIED
+	folio          	 CDATA                  #IMPLIED
+	sessionIOR     	 CDATA                  #IMPLIED
+	objectIOR     	 CDATA                  #IMPLIED
+	copyright        CDATA                  #IMPLIED
+	orig-obj-ref     CDATA                  #IMPLIED
+	orig-obj-src     CDATA                  #IMPLIED
+	archive-storing  (%t.archive-storing;)  #IMPLIED
+	version          CDATA                  #IMPLIED
+	slug             CDATA                  #IMPLIED
+	print-page       CDATA                  #IMPLIED
+	print-section	CDATA                  	#IMPLIED
+	print-folio	CDATA                  	#IMPLIED
+	guid     	CDATA                  	#IMPLIED
+	url     	CDATA                  	#IMPLIED
+	column     	CDATA                  	#IMPLIED
+	root-id     	CDATA          		#IMPLIED
+	last-pub-date	CDATA			#IMPLIED
+	canonical-url	CDATA			#IMPLIED
+	date-type	CDATA			#IMPLIED
+	revision-type	CDATA			#IMPLIED
+	major-revision-date	CDATA			#IMPLIED
+	seo-url     	CDATA                  	#IMPLIED
+	seo-id     	CDATA                  	#IMPLIED	
+	tz-label	CDATA                  	#IMPLIED
+	tz-offset     	CDATA                  	#IMPLIED
+	">
+
+<!-- Note that most elements have #implied IDs except article-doc and client-imagemap.-->
+
+
+<!-- ======================================================== -->
+<!--                       ELEMENTS                           -->
+<!-- ======================================================== -->
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- ARTICLE-DOC:   MAIN DOCUMENT FOR EDITORS -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+
+<!ELEMENT article-doc (meta-data?, summary?, article) >
+<!--<Title>a -->
+
+
+<!ATTLIST article-doc 
+     %a.article-doc;
+     >
+
+
+<!-- - - - - - - - - - - meta-data element  - - - - - - - - - - - - - - -->
+<!ELEMENT meta-data (self-codes? | properties?)* >
+<!--<Title>a1 -->
+
+<!ATTLIST meta-data %a.global;>
+
+<!-- sje: I'm thinking some of these elements should be required, and hence
+	the container should also be required, but I don't know which ones
+	at the moment. -->
+<!ELEMENT wsj-2k-info (publication-list?, topic-list?, running-story-list?, 
+			region-list?, industry-list?, company-list? ) >
+
+<!ELEMENT publication-list (publication)+ >
+<!ELEMENT publication (#PCDATA)* >
+
+<!ELEMENT topic-list (topic)+ >
+<!ELEMENT topic (#PCDATA)* >
+
+<!ELEMENT running-story-list (running-story)+ >
+<!ELEMENT running-story (#PCDATA)* >
+
+<!ELEMENT region-list (region)+ >
+<!ELEMENT region (#PCDATA)* >
+
+<!ELEMENT industry-list (industry)+ >
+<!ELEMENT industry (#PCDATA)* >
+
+<!ELEMENT company-list (company)+ >
+<!ELEMENT company (#PCDATA)* >
+
+<!ELEMENT self-codes (code | search-term | properties)*  >
+<!--<Title>a1a -->
+
+<!ELEMENT inco-codes (code | search-term)+  >
+<!--<Title>a1b -->
+
+<!ELEMENT code (%m.enriched-text-with-break;)*>
+<!--<Title>a1b1 -->
+
+<!ATTLIST code 
 	type CDATA #REQUIRED
-	ticker CDATA #REQUIRED
->
-<!ATTLIST in-set
-	%common.atts; 
-	%TextAlign; 
->
-<!ATTLIST header
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "headline"
-	href CDATA #IMPLIED
->
-<!ATTLIST text
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST tables
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST extra
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST byline-box
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST grouphead
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "headline"
-	href CDATA #IMPLIED
->
-<!ATTLIST summary-print
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST webposted
-	%common.atts; 
->
-<!ATTLIST photo-group
-	%common.atts; 
->
-<!ATTLIST photo-print
-	%common.atts; 
->
-<!ATTLIST photo-web
-	%common.atts;
-	channel CDATA #IMPLIED
-	float (left | center | right | none) "none"
-	popupSize CDATA ""
->
-<!ATTLIST pg-photo
-	%common.atts;
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "picture"
-	href CDATA #IMPLIED
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST p-photo
-	%common.atts; 
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST w-photo
-	%common.atts; 
-	align %ImgAlign; "top"
-	alt-text %Text; #IMPLIED
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST photo-caption
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "caption"
-	href CDATA #IMPLIED
->
-<!ATTLIST photo-prod
-	%common.atts; 
->
-<!ATTLIST photo-data
-	%common.atts; 
-	copyright CDATA #IMPLIED
->
-<!ATTLIST credits-text
-	%common.atts; 
->
-<!ATTLIST video
-	%common.atts; 
-	channel CDATA #IMPLIED
-	coding CDATA #IMPLIED
-	name CDATA #IMPLIED
-	source %URI; #IMPLIED
-	time CDATA #IMPLIED
-	time-unit-of-measure CDATA #IMPLIED
-	type CDATA #IMPLIED
->
-<!ATTLIST video-caption
-	%common.atts; 
->
-<!ATTLIST video-prod
-	%common.atts; 
->
-<!ATTLIST video-data
-	%common.atts; 
-	copyright CDATA #IMPLIED
->
-<!ATTLIST audio
-	%common.atts; 
-	channel CDATA #IMPLIED
-	coding CDATA #IMPLIED
-	name CDATA #IMPLIED
-	source %URI; #IMPLIED
-	time CDATA #IMPLIED
-	time-unit-of-measure CDATA #IMPLIED
-	type CDATA #IMPLIED
->
-<!ATTLIST audio-caption
-	%common.atts; 
->
-<!ATTLIST audio-prod
-	%common.atts; 
->
-<!ATTLIST audio-data
-	%common.atts; 
-	copyright CDATA #IMPLIED
->
-<!ATTLIST chart-group
-	%common.atts; 
->
-<!ATTLIST chart
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "graphic"
-	href CDATA #IMPLIED
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST cg-chart
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "graphic"
-	href CDATA #IMPLIED
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST chart-caption
-	%common.atts; 
->
-<!ATTLIST chart-prod
-	%common.atts; 
->
-<!ATTLIST chart-data
-	%common.atts; 
-	Copyright CDATA #IMPLIED
->
-<!ATTLIST infographic
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "graphic"
-	href CDATA #IMPLIED
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST infographic-caption
-	%common.atts; 
->
-<!ATTLIST infographic-prod
-	%common.atts; 
->
-<!ATTLIST infographic-data
-	%common.atts; 
-	Copyright CDATA #IMPLIED
->
-<!ATTLIST display-ad
-	%common.atts; 
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "ad"
-	href CDATA #IMPLIED
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST display-ad-prod
-	%common.atts; 
->
-<!ATTLIST display-ad-data
-	%common.atts; 
-	Copyright CDATA #IMPLIED
->
-<!ATTLIST logo
-	%common.atts; 
-	align %ImgAlign; "top"
-	fileref %URI; #IMPLIED
-	alt %Text; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	scale %Length; #IMPLIED
-	scalefit %Length; #IMPLIED
-	type CDATA #IMPLIED
-	name CDATA #IMPLIED
-	longdesc %URI; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	units (pixels) "pixels"
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ATTLIST zipper-headline
-	%common.atts;
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "text"
-	href CDATA #IMPLIED
->
-<!ATTLIST related-link
-	%common.atts; 
->
-<!ATTLIST a
-	%attrs; 
-	href %URI; #REQUIRED
-	charset %Charset; #IMPLIED
-	type %ContentType; #IMPLIED
-	name NMTOKEN #IMPLIED
-	hreflang %LanguageCode; #IMPLIED
-	rel %LinkTypes; #IMPLIED
-	rev %LinkTypes; #IMPLIED
-	accesskey %Character; #IMPLIED
-	shape %Shape; "rect"
-	coords %Coords; #IMPLIED
-	tabindex %Number; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
-	target %FrameTarget; #IMPLIED
->
-<!ATTLIST related-links
-	%common.atts; 
->
-<!ATTLIST out-set
-	%common.atts; 
-	%TextAlign; 
->
-<!-- =====================================================================-->
-<!-- =====================================================================-->
-<!--================== Content models for exclusions =====================-->
-<!-- style info, which may include CDATA sections -->
-<!ELEMENT style (#PCDATA)>
-<!ATTLIST style
-	id ID #IMPLIED
-	%i18n; 
-	type %ContentType; #REQUIRED
-	media %MediaDesc; #IMPLIED
-	title %Text; #IMPLIED
-	xml:space (preserve | default) #FIXED "preserve"
->
-<!--                                                                  -->
-<!--==================== OBJECT ======================================-->
-<!ENTITY % flow "(%block; | %inline;)">
-<!-- generic embedded object -->
-<!ELEMENT object (param | embed | %flow;)*>
-<!ATTLIST object
-	%attrs; 
-	declare (declare) #IMPLIED
-	classid %URI; #IMPLIED
-	codebase %URI; #IMPLIED
-	data %URI; #IMPLIED
-	type %ContentType; #IMPLIED
-	codetype %ContentType; #IMPLIED
-	archive CDATA #IMPLIED
-	standby %Text; #IMPLIED
-	height %Length; #IMPLIED
-	width %Length; #IMPLIED
-	usemap %URI; #IMPLIED
-	name CDATA #IMPLIED
-	tabindex CDATA #IMPLIED
-	align %ImgAlign; #IMPLIED
-	border %Pixels; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!ELEMENT param EMPTY>
-<!ATTLIST param
-	id ID #IMPLIED
-	name CDATA #REQUIRED
-	value CDATA #IMPLIED
-	valuetype (data | ref | object) "data"
-	type %ContentType; #IMPLIED
->
-<!ELEMENT embed EMPTY>
-<!ATTLIST embed
-	src %URI; #IMPLIED
-	width %Length; #IMPLIED
-	height %Length; #IMPLIED
-	play (true | false) "true"
-	loop (true | false) "true"
-	quality (best | high | autohigh | autolow | low) "high"
-	pluginspage %URI; #IMPLIED
-	type %ContentType; #IMPLIED
-	bgcolor %Color; #IMPLIED
-	scale (showall | noborder | exactfit) #IMPLIED
-	name CDATA #IMPLIED
-	swliveconnect (true | false) #IMPLIED
-	salign (l | t | r | b | tl | tr | bl | br) #IMPLIED
-	menu (true | false) #IMPLIED
-	base %URI; #IMPLIED
->
-<!--                                                                   -->
-<!--=================== Java APPLET ==================================-->
-<!--
-  One of code or object attributes must be present.
-  Place PARAM elements before other content.
--->
-<!ELEMENT applet (param | %flow;)*>
-<!ATTLIST applet
-	%coreattrs; 
-	codebase %URI; #IMPLIED
-	archive CDATA #IMPLIED
-	code CDATA #IMPLIED
-	object CDATA #IMPLIED
-	alt %Text; #IMPLIED
-	name CDATA #IMPLIED
-	width %Length; #REQUIRED
-	height %Length; #REQUIRED
-	align %ImgAlign; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!--                                                                   -->
-<!--================== Client-side image maps ============================-->
-<!--                                                                   -->
-<!-- These can be placed in the same document or grouped in a
-     separate document although this isn't yet widely supported -->
-<!--                                                                   -->
-<!ELEMENT map ((%block;) | area)+>
-<!ATTLIST map
-	%attrs; 
-	name CDATA #REQUIRED
->
-<!ELEMENT area EMPTY>
-<!ATTLIST area
-	%attrs; 
-	shape %Shape; "rect"
-	coords %Coords; #IMPLIED
-	href %URI; #IMPLIED
-	nohref (nohref) #IMPLIED
-	alt %Text; #IMPLIED
-	tabindex CDATA #IMPLIED
-	accesskey %Character; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
->
-<!ELEMENT div %Flow;>
-<!-- generic language/style container -->
-<!ATTLIST div
-	%attrs; 
-	%TextAlign; 
->
-<!--=================== Annotation =======================================-->
-<!ELEMENT annotation (#PCDATA)>
-<!ATTLIST annotation
-	%common.atts; 
-	username CDATA #IMPLIED
-	initials CDATA #IMPLIED
-	time %Datetime; #IMPLIED
-	note %Text; #IMPLIED
->
-<!--=================== Paragraphs =======================================-->
-<!ELEMENT p (%Linetext;)*>
-<!ATTLIST p
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT subhead (%Linetext;)*>
-<!ATTLIST subhead
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT small-head (%Linetext;)*>
-<!ATTLIST small-head
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT high-head (%Linetext;)*>
-<!ATTLIST high-head
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT question (%Linetext; | %Media;)*>
-<!ATTLIST question
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT byline (%Linetext; | column-name)*>
-<!ATTLIST byline
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT answer (%Linetext; | %Media;)*>
-<!ATTLIST answer
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT xref (%Linetext; | %Media;)*>
-<!ATTLIST xref
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT lede1 (%Linetext;)*>
-<!ATTLIST lede1
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
+        symbol CDATA #REQUIRED
+        description CDATA #IMPLIED
+        internal CDATA #IMPLIED
+        vrtysux CDATA #IMPLIED
+        seoname CDATA #IMPLIED
+        reference CDATA #IMPLIED
+        >
+
+<!ELEMENT properties (property)*  >
+
+<!ELEMENT property (type? | value? | itemid? | properties?)* >
+
+<!-- - - - - - - - - - - summary element  - - - - - - - - - - - - - - - - -->
+
+<!ELEMENT summary (summary-header?, alt-summary-body*, summary-body) >
+<!--<Title>a2 -->
+<!ATTLIST summary 
+        %a.global-required;
+        type             CDATA                  #IMPLIED
+        display-name     CDATA                  #IMPLIED
+        level            (%t.level;)            #IMPLIED
+        >
+
+<!ELEMENT summary-header  (nameloc*, client-imagemap*) > 
+<!--<Title>a2a -->
+
+<!ELEMENT alt-summary-body (headline|byline|(%m.container;))* >
+<!--<Title>a2b -->
+
+<!ATTLIST alt-summary-body
+	%a.global;
+        page             CDATA                  #IMPLIED
+	destination-type CDATA			#IMPLIED
+	destination-id   CDATA			#IMPLIED
 	>
-<!ELEMENT lede2 (%Linetext;)*>
-<!ATTLIST lede2
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
-	>
-<!ELEMENT lede3 (%Linetext;)*>
-<!ATTLIST lede3
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
-	>
-<!ELEMENT lede4 (%Linetext;)*>
-<!ATTLIST lede4
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
-	>
-<!ELEMENT lede5 (%Linetext;)*>
-<!ATTLIST lede5
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
-	>
-<!ELEMENT lede6 (%Linetext;)*>
-<!ATTLIST lede6
-	%attrs; 
-	%TextAlign; 
-	channel CDATA #IMPLIED
-	>
-<!--=================== Headings =========================================-->
-<!--
-  There are six levels of headings from h1 (the most important)
-  to h6 (the least important).
--->
-<!ELEMENT h1 (%Linetext;)*>
-<!ATTLIST h1
-	%attrs; 
-	%TextAlign; 
->
-<!ELEMENT h2 (%Linetext;)*>
-<!ATTLIST h2
-	%attrs; 
-	%TextAlign; 
->
-<!ELEMENT h3 (%Linetext;)*>
-<!ATTLIST h3
-	%attrs; 
-	%TextAlign; 
->
-<!ELEMENT h4 (%Linetext;)*>
-<!ATTLIST h4
-	%attrs; 
-	%TextAlign; 
->
-<!ELEMENT h5 (%Linetext;)*>
-<!ATTLIST h5
-	%attrs; 
-	%TextAlign; 
->
-<!ELEMENT h6 (%Linetext;)*>
-<!ATTLIST h6
-	%attrs; 
-	%TextAlign; 
->
-<!--=================== Lists ============================================-->
-<!-- Unordered list bullet styles -->
-<!ENTITY % ULStyle "(disc|square|circle)">
-<!-- Unordered list -->
-<!ELEMENT ul (li)+>
-<!ATTLIST ul
-	%attrs; 
-	type %ULStyle; #IMPLIED
-	compact (compact) #IMPLIED
->
-<!-- Ordered list numbering style
 
-    1   arabic numbers      1, 2, 3, ...
-    a   lower alpha         a, b, c, ...
-    A   upper alpha         A, B, C, ...
-    i   lower roman         i, ii, iii, ...
-    I   upper roman         I, II, III, ...
+<!ELEMENT summary-body (headline|byline|(%m.container;))* >
+<!--<Title>a2c -->
 
-    The style is applied to the sequence number which by default
-    is reset to 1 for the first list item in an ordered list.
--->
-<!ENTITY % OLStyle "CDATA">
-<!-- Ordered (numbered) list -->
-<!ELEMENT ol (li)+>
-<!ATTLIST ol
-	%attrs; 
-	type %OLStyle; #IMPLIED
-	compact (compact) #IMPLIED
-	start %Number; #IMPLIED
->
-<!-- LIStyle is constrained to: "(%ULStyle;|%OLStyle;)" -->
-<!ENTITY % LIStyle "CDATA">
-<!-- list item -->
-<!ELEMENT li %emflow;>
-<!ATTLIST li
-	%attrs; 
-	type %LIStyle; #IMPLIED
-	value %Number; #IMPLIED
->
-<!-- definition lists - dt for term, dd for its definition -->
-<!ELEMENT dl (dt | dd)+>
-<!ATTLIST dl
-	%attrs; 
-	compact (compact) #IMPLIED
->
-<!ELEMENT dt (%Linetext; | %Media;)*>
-<!ATTLIST dt
-	%attrs; 
->
-<!ELEMENT dd %emflow;>
-<!ATTLIST dd
-	%attrs; 
->
-<!--=================== Address ==========================================-->
-<!-- information on author -->
-<!ELEMENT address (%Linetext;)*>
-<!ATTLIST address
-	%attrs; 
->
-<!--=================== Horizontal Rule ==================================-->
-<!ELEMENT hr EMPTY>
-<!ATTLIST hr
-	%attrs; 
-	align (left | center | right) #IMPLIED
-	noshade (noshade) #IMPLIED
-	size %Pixels; #IMPLIED
-	width %Length; #IMPLIED
->
-<!--=================== Block-like Quotes ================================-->
-<!ELEMENT blockquote %emflow;>
-<!ATTLIST blockquote
-	%attrs; 
-	cite %URI; #IMPLIED
->
-<!--=================== Text alignment ===================================-->
-<!-- center content -->
-<!ELEMENT center %emflow;>
-<!ATTLIST center
-	%attrs; 
->
-<!--===================== Inline Elements ================================-->
-<!ELEMENT span (%Linetext; | %Media;)*>
-<!-- generic language/style container -->
-<!ATTLIST span
-	%attrs; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT email (%Linetext;)*>
-<!-- generic language/style container -->
-<!ATTLIST email
-	%attrs; 
-	channel CDATA #IMPLIED
->
-<!ELEMENT br EMPTY>
-<!-- forced line break -->
-<!ATTLIST br
-	%coreattrs; 
-	clear (left | all | right | none) "none"
->
-<!ELEMENT pagebreak EMPTY>
-<!-- forced page break -->
-<!ATTLIST pagebreak
-	%common.atts; 
->
-<!ELEMENT sysvar EMPTY>
-<!-- system variables -->
-<!ATTLIST sysvar
-	%coreattrs; 
-	format CDATA #IMPLIED
-	type CDATA #IMPLIED
-	data CDATA #IMPLIED
-	pgl CDATA #IMPLIED
->
-<!ELEMENT ld EMPTY>
-<!ATTLIST ld
-	%coreattrs; 
-	pattern CDATA " "
-	width %Length; #IMPLIED
->
-<!ELEMENT em (%Linetext;)*>
-<!-- emphasis -->
-<!ATTLIST em
-	%attrs; 
->
-<!ELEMENT strong (%Linetext;)*>
-<!-- strong emphasis -->
-<!ATTLIST strong
-	%attrs; 
->
-<!ELEMENT cite (%Linetext;)*>
-<!-- citation -->
-<!ATTLIST cite
-	%attrs; 
->
-<!ELEMENT abbr (%Linetext;)*>
-<!-- abbreviation -->
-<!ATTLIST abbr
-	%attrs; 
->
-<!ELEMENT acronym (%Linetext;)*>
-<!-- acronym -->
-<!ATTLIST acronym
-	%attrs; 
->
-<!ELEMENT q (%Linetext;)*>
-<!-- inlined quote -->
-<!ATTLIST q
-	%attrs; 
-	cite %URI; #IMPLIED
->
-<!ELEMENT sub (%Linetext;)*>
-<!-- subscript -->
-<!ATTLIST sub
-	%attrs; 
->
-<!ELEMENT sup (%Linetext;)*>
-<!-- superscript -->
-<!ATTLIST sup
-	%attrs; 
->
-<!ELEMENT tt (%Linetext;)*>
-<!-- fixed pitch font -->
-<!ATTLIST tt
-	%attrs; 
->
-<!ELEMENT i (%Linetext;)*>
-<!-- italic font -->
-<!ATTLIST i
-	%attrs; 
->
-<!ELEMENT b (%Linetext;)*>
-<!-- bold font -->
-<!ATTLIST b
-	%attrs; 
->
-<!ELEMENT big (%Linetext;)*>
-<!-- bigger font -->
-<!ATTLIST big
-	%attrs; 
->
-<!ELEMENT small (%Linetext;)*>
-<!-- smaller font -->
-<!ATTLIST small
-	%attrs; 
->
-<!ELEMENT u (%Linetext;)*>
-<!-- underline -->
-<!ATTLIST u
-	%attrs; 
->
-<!ELEMENT s (%Linetext;)*>
-<!-- strike-through -->
-<!ATTLIST s
-	%attrs; 
->
-<!ELEMENT strike (%Linetext;)*>
-<!-- strike-through -->
-<!ATTLIST strike
-	%attrs; 
->
-<!ELEMENT font (%Linetext;)*>
-<!-- local change to font -->
-<!ATTLIST font
-	id ID #IMPLIED
-	%i18n; 
-	size CDATA #IMPLIED
-	color %Color; #IMPLIED
-	face CDATA #IMPLIED
->
-<!ELEMENT n (%Linetext;)*>
-<!-- normal -->
-<!ATTLIST n
-	%attrs; 
->
-<!ELEMENT c (%Linetext;)*>
-<!-- condensed -->
-<!ATTLIST c
-	%attrs; 
->
-<!ELEMENT xc (%Linetext;)*>
-<!-- extra condensed -->
-<!ATTLIST xc
-	%attrs; 
->
-<!ELEMENT l (%Linetext;)*>
-<!-- large -->
-<!ATTLIST l
-	%attrs; 
->
-<!ELEMENT xl (%Linetext;)*>
-<!-- extra large -->
-<!ATTLIST xl
-	%attrs; 
->
-<!ELEMENT sc (%Linetext;)*>
-<!-- small caps -->
-<!ATTLIST sc
-	%attrs; 
->
-<!ELEMENT bi (%Linetext;)*>
-<!-- bold italic -->
-<!ATTLIST bi
-	%attrs; 
->
-<!ELEMENT s1 (%Linetext;)*>
-<!-- sequence 1 -->
-<!ATTLIST s1
-	%attrs; 
->
-<!ELEMENT s2 (%Linetext;)*>
-<!-- sequence 2 -->
-<!ATTLIST s2
-	%attrs; 
->
-<!ELEMENT s3 (%Linetext;)*>
-<!-- sequence 3 -->
-<!ATTLIST s3
-	%attrs; 
->
-<!ELEMENT s4 (%Linetext;)*>
-<!-- sequence 4 -->
-<!ATTLIST s4
-	%attrs; 
->
-<!ELEMENT s5 (%Linetext;)*>
-<!-- sequence 5 -->
-<!ATTLIST s5
-	%attrs; 
->
-<!ELEMENT s6 (%Linetext;)*>
-<!-- sequence 6 -->
-<!ATTLIST s6
-	%attrs; 
->
-<!ELEMENT s7 (%Linetext;)*>
-<!-- sequence 7 -->
-<!ATTLIST s7
-	%attrs; 
->
-<!ELEMENT s8 (%Linetext;)*>
-<!-- sequence 8 -->
-<!ATTLIST s8
-	%attrs; 
->
-<!ELEMENT s9 (%Linetext;)*>
-<!-- sequence 9 -->
-<!ATTLIST s9
-	%attrs; 
->
-<!ELEMENT s10 (%Linetext;)*>
-<!-- sequence 10 -->
-<!ATTLIST s10
-	%attrs; 
->
-<!ELEMENT f1 (%Linetext;)*>
-<!-- font 1 -->
-<!ATTLIST f1
-	%attrs; 
->
-<!ELEMENT f2 (%Linetext;)*>
-<!-- font 2 -->
-<!ATTLIST f2
-	%attrs; 
->
-<!ELEMENT f3 (%Linetext;)*>
-<!-- font 3 -->
-<!ATTLIST f3
-	%attrs; 
->
-<!ELEMENT f4 (%Linetext;)*>
-<!-- font 4 -->
-<!ATTLIST f4
-	%attrs; 
->
-<!ELEMENT f5 (%Linetext;)*>
-<!-- font f5 -->
-<!ATTLIST f5
-	%attrs; 
->
-<!ELEMENT f6 (%Linetext;)*>
-<!-- font 6 -->
-<!ATTLIST f6
-	%attrs; 
->
-<!ELEMENT f7 (%Linetext;)*>
-<!-- font 7 -->
-<!ATTLIST f7
-	%attrs; 
->
-<!ELEMENT f8 (%Linetext;)*>
-<!-- font 8 -->
-<!ATTLIST f8
-	%attrs; 
->
-<!ELEMENT f9 (%Linetext;)*>
-<!-- font 9 -->
-<!ATTLIST f9
-	%attrs; 
->
-<!--=================== Images ===========================================-->
-<!--
-   To avoid accessibility problems for people who aren't
-   able to see the image, you should provide a text
-   description using the alt and longdesc attributes.
-   In addition, avoid the use of server-side image maps.
--->
-<!ELEMENT img EMPTY>
-<!ATTLIST img
-	%attrs; 
-	src %URI; #REQUIRED
-	alt %Text; #IMPLIED
-	name NMTOKEN #IMPLIED
-	longdesc %URI; #IMPLIED
-	height %Length; #IMPLIED
-	width %Length; #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	align %ImgAlign; #IMPLIED
-	border %Length; #IMPLIED
-	hspace %Pixels; #IMPLIED
-	vspace %Pixels; #IMPLIED
->
-<!-- usemap points to a map element which may be in this document
-  or an external document, although the latter is not widely supported -->
-<!--================ Forms ============================================-->
-<!ELEMENT form (%flow;)*>
-<!ATTLIST form
-	%attrs; 
-	action %URI; #REQUIRED
-	method (get | post) "get"
-	enctype %ContentType; "application/x-www-form-urlencoded"
-	accept %ContentTypes; #IMPLIED
-	name CDATA #IMPLIED
-	onsubmit %Script; #IMPLIED
-	onreset %Script; #IMPLIED
-	target %FrameTarget; #IMPLIED
-	accept-charset %Charsets; #IMPLIED
->
-<!-- Each label must not contain more than ONE field -->
-<!ELEMENT label (%inline;)*>
-<!ATTLIST label
-	%attrs; 
-	for IDREF #IMPLIED
-	accesskey %Character; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
->
-<!ENTITY % InputType "(text | password | checkbox |
-      radio | submit | reset |
-      file | hidden | image | button)">
-<!-- attribute name required for all but submit and reset -->
-<!ELEMENT input EMPTY>
-<!ATTLIST input
-	%attrs; 
-	type %InputType; "text"
-	name CDATA #IMPLIED
-	value CDATA #IMPLIED
-	checked (checked) #IMPLIED
-	disabled (disabled) #IMPLIED
-	readonly (readonly) #IMPLIED
-	size CDATA #IMPLIED
-	maxlength %Number; #IMPLIED
-	src %URI; #IMPLIED
-	alt CDATA #IMPLIED
-	usemap %URI; #IMPLIED
-	ismap (ismap) #IMPLIED
-	tabindex %Number; #IMPLIED
-	accesskey %Character; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
-	onselect %Script; #IMPLIED
-	onchange %Script; #IMPLIED
-	accept %ContentTypes; #IMPLIED
-	align %ImgAlign; #IMPLIED
->
-<!ELEMENT select (optgroup | option)+>
-<!ATTLIST select
-	%attrs; 
-	name CDATA #IMPLIED
-	size %Number; #IMPLIED
-	multiple (multiple) #IMPLIED
-	disabled (disabled) #IMPLIED
-	tabindex %Number; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
-	onchange %Script; #IMPLIED
->
-<!ELEMENT optgroup (option)+>
-<!ATTLIST optgroup
-	%attrs; 
-	disabled (disabled) #IMPLIED
-	label %Text; #REQUIRED
->
-<!ELEMENT option (#PCDATA)>
-<!ATTLIST option
-	%attrs; 
-	selected (selected) #IMPLIED
-	disabled (disabled) #IMPLIED
-	label %Text; #IMPLIED
-	value CDATA #IMPLIED
->
-<!ELEMENT textarea (#PCDATA)>
-<!ATTLIST textarea
-	%attrs; 
-	name CDATA #IMPLIED
-	rows %Number; #REQUIRED
-	cols %Number; #REQUIRED
-	disabled (disabled) #IMPLIED
-	readonly (readonly) #IMPLIED
-	tabindex %Number; #IMPLIED
-	accesskey %Character; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
-	onselect %Script; #IMPLIED
-	onchange %Script; #IMPLIED
->
-<!--
-    #PCDATA is to solve the mixed content problem,
-    per specification only whitespace is allowed there!
-   -->
-<!ELEMENT fieldset (#PCDATA | legend | %inline; | %block;)*>
-<!ATTLIST fieldset
-	%attrs; 
->
-<!ELEMENT legend (%inline;)*>
-<!ENTITY % LAlign "(top|bottom|left|right)">
-<!ATTLIST legend
-	%attrs; 
-	accesskey %Character; #IMPLIED
-	align %LAlign; #IMPLIED
->
-<!ELEMENT button (%flow;)*>
-<!ATTLIST button
-	%attrs; 
-	name CDATA #IMPLIED
-	value CDATA #IMPLIED
-	type (button | submit | reset) "submit"
-	disabled (disabled) #IMPLIED
-	tabindex %Number; #IMPLIED
-	accesskey %Character; #IMPLIED
-	onfocus %Script; #IMPLIED
-	onblur %Script; #IMPLIED
->
-<!--======================= Tables =======================================-->
-<!-- Derived from IETF HTML table standard, see [RFC1942] -->
-<!--
- The border attribute sets the thickness of the frame around the
- table. The default units are screen pixels.
 
- The frame attribute specifies which parts of the frame around
- the table should be rendered. The values are not the same as
- CALS to avoid a name clash with the valign attribute.
--->
-<!ENTITY % TFrame "(void | above | below | hsides | lhs | rhs | vsides | box | border)">
-<!--
- The rules attribute defines which rules to draw between cells:
+<!-- - - - - - - - - - - article element  - - - - - - - - - - - - - - - - -->
 
- If rules is absent then assume:
-     "none" if border is absent or border="0" otherwise "all"
--->
-<!ENTITY % TRules "(none | groups | rows | cols | all)">
-<!-- horizontal placement of table relative to document -->
-<!ENTITY % TAlign "(left | center | right)">
-<!-- horizontal alignment attributes for cell contents
+<!ELEMENT article (article-header?, article-body) >
+<!--<Title>a3b -->
 
-  char        alignment char, e.g. char=':'
-  charoff     offset for alignment char
--->
-<!ENTITY % cellhalign "align (left | center | right | justify | char) #IMPLIED
-   char       %Character;    #IMPLIED
-   charoff    %Length;       #IMPLIED">
-<!-- vertical alignment attributes for cell contents -->
-<!ENTITY % cellvalign "valign (top | middle | bottom | baseline) #IMPLIED">
-<!ELEMENT table (caption?, (col* | colgroup*), thead?, tfoot?, (tbody+ | tr+))>
-<!ELEMENT caption (%Linetext;)*>
-<!ELEMENT thead (tr)+>
-<!ELEMENT tfoot (tr)+>
-<!ELEMENT tbody (tr)+>
-<!ELEMENT colgroup (col)*>
-<!ELEMENT col EMPTY>
-<!ELEMENT tr (th | td)+>
-<!ELEMENT th %emflow;>
-<!ELEMENT td %emflow;>
-<!ATTLIST table
-	%attrs; 
-	summary %Text; #IMPLIED
-	width %Length; #IMPLIED
-	border %Pixels; #IMPLIED
-	frame %TFrame; #IMPLIED
-	rules %TRules; #IMPLIED
-	cellspacing %Length; #IMPLIED
-	cellpadding %Length; #IMPLIED
-	align %TAlign; #IMPLIED
-	bgcolor %Color; #IMPLIED
-	channel CDATA #IMPLIED
-	contentItem CDATA #IMPLIED
-	contentType CDATA "table"
-	href CDATA #IMPLIED
->
-<!ENTITY % CAlign "(top|bottom|left|right)">
-<!ATTLIST caption
-	%attrs; 
-	align %CAlign; #IMPLIED
->
-<!--
-colgroup groups a set of col elements. It allows you to group
-several semantically related columns together.
--->
-<!ATTLIST colgroup
-	%attrs; 
-	span %Number; "1"
-	width %MultiLength; #IMPLIED
-	%cellhalign; 
-	%cellvalign; 
->
-<!--
- col elements define the alignment properties for cells in
- one or more columns.
+<!ATTLIST article %a.global;>
 
- The width attribute specifies the width of the columns, e.g.
+<!ELEMENT article-header  (nameloc*, client-imagemap*) >
+<!--<Title>a3a -->
 
-     width=64        width in screen pixels
-     width=0.5*      relative width of 0.5
+<!ELEMENT article-body (media?,headline,byline?,(%m.container;)*) >
+<!--<Title>a3b -->
 
- The span attribute causes the attributes of one
- col element to apply to more than one column.
--->
-<!ATTLIST col
-	%attrs; 
-	span %Number; "1"
-	width %MultiLength; #IMPLIED
-	%cellhalign; 
-	%cellvalign; 
->
-<!--
-    Use thead to duplicate headers when breaking table
-    across page boundaries, or for static headers when
-    tbody sections are rendered in scrolling panel.
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Byline, credit, tagline -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    Use tfoot to duplicate footers when breaking table
-    across page boundaries, or for static footers when
-    tbody sections are rendered in scrolling panel.
+<!ELEMENT byline (%m.enriched-text;|credit)* >
+<!--<Title>a3b1d -->
 
-    Use multiple tbody sections when rules are needed
-    between groups of table rows.
--->
-<!ATTLIST thead
-	%attrs; 
-	%cellhalign; 
-	%cellvalign; 
->
-<!ATTLIST tfoot
-	%attrs; 
-	%cellhalign; 
-	%cellvalign; 
->
-<!ATTLIST tbody
-	%attrs; 
-	%cellhalign; 
-	%cellvalign; 
->
-<!ATTLIST tr
-	%attrs; 
-	%cellhalign; 
-	%cellvalign; 
-	bgcolor %Color; #IMPLIED
-	height %Pixels; #IMPLIED
->
-<!-- Scope is simpler than headers attribute for common tables -->
-<!ENTITY % Scope "(row|col|rowgroup|colgroup)">
-<!-- th is for headers, td for data and for cells acting as both -->
-<!ATTLIST th
-	%attrs; 
-	abbr %Text; #IMPLIED
-	axis CDATA #IMPLIED
-	headers IDREFS #IMPLIED
-	scope %Scope; #IMPLIED
-	rowspan %Number; "1"
-	colspan %Number; "1"
-	%cellhalign; 
-	%cellvalign; 
-	nowrap (nowrap) #IMPLIED
-	bgcolor %Color; #IMPLIED
-	width %Pixels; #IMPLIED
-	height %Pixels; #IMPLIED
->
-<!ATTLIST td
-	%attrs; 
-	abbr %Text; #IMPLIED
-	axis CDATA #IMPLIED
-	headers IDREFS #IMPLIED
-	scope %Scope; #IMPLIED
-	rowspan %Number; "1"
-	colspan %Number; "1"
-	%cellhalign; 
-	%cellvalign; 
-	nowrap (nowrap) #IMPLIED
-	bgcolor %Color; #IMPLIED
-	width %Pixels; #IMPLIED
-	height %Pixels; #IMPLIED
->
-<!--================ Document Head ====================================-->
-<!ELEMENT isindex EMPTY>
-<!ATTLIST isindex
-	id ID #IMPLIED
-	%i18n; 
-	prompt %Text; #IMPLIED
->
-<!--                                                                   -->
-<!--====================  SCRIPT ======================================-->
-<!--                                                                   -->
-<!ELEMENT script (#PCDATA)>
-<!ATTLIST script
-	charset %Charset; #IMPLIED
-	type %ContentType; #REQUIRED
-	language CDATA #IMPLIED
-	src %URI; #IMPLIED
-	defer (defer) #IMPLIED
-	event CDATA #IMPLIED
-	for %URI; #IMPLIED
-	xml:space (preserve | default) #FIXED "preserve"
->
-<!ELEMENT noscript (%flow;)*>
-<!ATTLIST noscript
-	%attrs; 
->
-<!-- =========================================  -->
-<!ENTITY % EditDoc "INCLUDE">
-<![ %EditDoc; [
+<!ATTLIST byline %a.global;
+                 type (%t.byline;) "SIGNED">
 
-<!ELEMENT doc (web-content?, zipper-headline?, story?, style?)>
+<!ELEMENT credit (%m.enriched-text;)* >
+<!--<Title>a3b1d1 -->
 
-]]>
+<!ATTLIST credit %a.global;>
 
-<!ATTLIST doc
-	%common.atts; 
->
-<!-- =============  END OF DOW JONES DTD ============  -->
+<!ELEMENT ident (%m.enriched-text;)* >
+<!--<Title>a3b1e -->
+
+<!ATTLIST ident %a.global; >
+
+<!ELEMENT tagline (%m.enriched-text-with-break;)* >
+<!--<Title>a3b1g -->
+
+<!ATTLIST tagline %a.global;>
+
+<!ELEMENT dateline (%m.enriched-text;)* >
+
+<!ATTLIST dateline %a.global;>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--  HEADER INFORMATION -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+<!ELEMENT nameloc (nmlist) >
+<!--<Title>d1 -->
+
+<!ATTLIST nameloc 
+          %a.global-required;
+          >
+
+<!ELEMENT nmlist  (#PCDATA) >
+<!--<Title>d1a -->
+
+<!ATTLIST nmlist 
+          docorsub      CDATA              #IMPLIED
+          nametype      (ELEMENT | ENTITY)  "ENTITY"
+          >
+
+<!ENTITY % DJML-Plus-Common-Elements PUBLIC "-//Dow Jones//ELEMENTS XML Common Element Models Version 1.0//EN"
+   "djml-plus-common-elts.dcl" >
+
+%DJML-Plus-Common-Elements;
